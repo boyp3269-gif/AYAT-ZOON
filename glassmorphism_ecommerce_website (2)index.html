@@ -1,0 +1,824 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AYATzoon - Simple Full E-commerce Site</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0f172a;
+      --bg-soft: #111827;
+      --card: rgba(255,255,255,0.08);
+      --card-2: rgba(255,255,255,0.12);
+      --line: rgba(255,255,255,0.14);
+      --text: #f8fafc;
+      --muted: #cbd5e1;
+      --primary: #22c55e;
+      --primary-dark: #16a34a;
+      --accent: #38bdf8;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --shadow: 0 18px 45px rgba(0,0,0,0.28);
+      --radius: 22px;
+      --radius-sm: 16px;
+      --max: 1240px;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background:
+        radial-gradient(circle at top left, rgba(34,197,94,0.16), transparent 25%),
+        radial-gradient(circle at top right, rgba(56,189,248,0.12), transparent 25%),
+        linear-gradient(135deg, #020617, #0f172a 35%, #111827 100%);
+      color: var(--text);
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    .container { width: min(calc(100% - 28px), var(--max)); margin: 0 auto; }
+    .glass {
+      background: linear-gradient(135deg, rgba(255,255,255,0.12), rgba(255,255,255,0.05));
+      border: 1px solid var(--line);
+      backdrop-filter: blur(18px);
+      -webkit-backdrop-filter: blur(18px);
+      box-shadow: var(--shadow);
+    }
+
+    .reveal { opacity: 0; transform: translateY(24px); transition: .7s ease; }
+    .reveal.show { opacity: 1; transform: translateY(0); }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      border: none;
+      cursor: pointer;
+      text-decoration: none;
+      color: white;
+      padding: 13px 18px;
+      border-radius: 14px;
+      font-weight: 700;
+      transition: .25s ease;
+    }
+    .btn:hover { transform: translateY(-2px); }
+    .btn-primary { background: linear-gradient(135deg, var(--primary), var(--primary-dark)); }
+    .btn-secondary { background: rgba(255,255,255,0.08); border: 1px solid var(--line); }
+    .btn-danger { background: var(--danger); }
+    .btn-block { width: 100%; }
+
+    .icon-btn {
+      width: 44px; height: 44px; border-radius: 14px;
+      display: inline-grid; place-items: center;
+      background: rgba(255,255,255,0.08); color: white;
+      border: 1px solid var(--line); cursor: pointer;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 14px;
+      border-radius: 999px;
+      border: 1px solid var(--line);
+      background: rgba(255,255,255,0.08);
+      color: #bbf7d0;
+      font-size: .92rem;
+      margin-bottom: 16px;
+    }
+
+    header {
+      position: sticky; top: 12px; z-index: 80;
+      padding-top: 14px;
+    }
+    .nav {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 18px; padding: 14px 16px; border-radius: 20px;
+    }
+    .brand {
+      display: flex; align-items: center; gap: 12px; text-decoration: none; color: white;
+    }
+    .brand-mark {
+      width: 46px; height: 46px; border-radius: 16px; display: grid; place-items: center;
+      background: linear-gradient(135deg, var(--primary), var(--accent)); font-weight: 800;
+      box-shadow: 0 14px 30px rgba(34,197,94,0.25);
+    }
+    .brand small { color: var(--muted); display: block; }
+
+    nav ul { list-style: none; display: flex; gap: 18px; align-items: center; }
+    nav a { color: var(--muted); text-decoration: none; font-weight: 600; }
+    nav a:hover { color: white; }
+    .nav-actions { display: flex; gap: 10px; align-items: center; }
+    .mobile-toggle { display: none; }
+
+    .hero { padding: 44px 0 30px; }
+    .hero-grid {
+      display: grid; grid-template-columns: 1.1fr .9fr; gap: 24px; align-items: stretch;
+    }
+    .hero-card, .hero-panel, .section-box, .cart-panel, .checkout-panel {
+      border-radius: var(--radius); padding: 28px;
+    }
+    h1 { font-size: clamp(2.4rem, 4vw, 4.8rem); line-height: 1.05; margin-bottom: 16px; }
+    h2 { font-size: clamp(1.8rem, 3vw, 2.8rem); line-height: 1.1; margin-bottom: 12px; }
+    h3 { font-size: 1.2rem; }
+    p.lead, .muted { color: var(--muted); }
+    p.lead { max-width: 640px; font-size: 1.04rem; }
+
+    .hero-actions, .hero-stats { display: flex; gap: 12px; flex-wrap: wrap; }
+    .hero-stats { margin-top: 26px; }
+    .stat {
+      min-width: 150px;
+      padding: 16px 18px; border-radius: 18px;
+      background: rgba(255,255,255,0.07); border: 1px solid var(--line);
+    }
+    .stat strong { display: block; font-size: 1.35rem; margin-bottom: 4px; }
+
+    .hero-visual {
+      min-height: 100%; display: grid; gap: 16px;
+    }
+    .visual-top {
+      min-height: 320px; border-radius: 22px; padding: 24px; position: relative; overflow: hidden;
+      display: grid; place-items: center;
+    }
+    .blob {
+      position: absolute; width: 240px; height: 240px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(34,197,94,.55), rgba(56,189,248,.18), transparent 70%);
+      filter: blur(14px); animation: pulse 5s ease infinite;
+    }
+    .hero-product {
+      position: relative; z-index: 2; width: 250px; aspect-ratio: 1/1; border-radius: 30px;
+      display: grid; place-items: center; font-size: 5.5rem;
+      background: linear-gradient(135deg, rgba(255,255,255,.25), rgba(255,255,255,.06));
+      border: 1px solid rgba(255,255,255,.2); transform: rotate(-8deg);
+    }
+    @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.08)} }
+
+    .visual-bottom {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px;
+    }
+    .mini {
+      padding: 18px; border-radius: 18px;
+      background: rgba(255,255,255,.06); border: 1px solid var(--line);
+    }
+
+    .section { padding: 72px 0; }
+    .section-head {
+      display: flex; justify-content: space-between; gap: 18px; align-items: end; margin-bottom: 24px;
+    }
+
+    .chips { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 18px; }
+    .chip {
+      padding: 10px 14px; border-radius: 999px; background: rgba(255,255,255,.08);
+      border: 1px solid var(--line); color: var(--muted); font-size: .92rem; cursor: pointer;
+    }
+    .chip.active { background: rgba(34,197,94,.15); color: white; border-color: rgba(34,197,94,.35); }
+
+    .category-grid, .product-grid, .feature-grid, .review-grid {
+      display: grid; gap: 18px;
+    }
+    .category-grid { grid-template-columns: repeat(4, 1fr); }
+    .product-grid { grid-template-columns: repeat(4, 1fr); }
+    .feature-grid, .review-grid { grid-template-columns: repeat(3, 1fr); }
+
+    .card {
+      border-radius: 20px; padding: 22px; position: relative;
+      transition: .28s ease; overflow: hidden;
+    }
+    .card:hover { transform: translateY(-7px); }
+
+    .category-icon, .product-media {
+      border-radius: 18px; display: grid; place-items: center; margin-bottom: 16px;
+      background: linear-gradient(135deg, rgba(255,255,255,.14), rgba(255,255,255,.05));
+      border: 1px solid var(--line);
+    }
+    .category-icon { width: 62px; height: 62px; font-size: 1.5rem; }
+    .product-media { min-height: 190px; font-size: 4rem; }
+
+    .tag {
+      position: absolute; top: 16px; right: 16px;
+      padding: 7px 12px; border-radius: 999px; font-size: .78rem; font-weight: 800;
+      background: rgba(34,197,94,.14); color: #bbf7d0; border: 1px solid rgba(34,197,94,.22);
+    }
+    .price-row, .product-actions, .cart-row, .summary-line {
+      display: flex; justify-content: space-between; align-items: center; gap: 12px;
+    }
+    .price-row { margin-top: 12px; }
+    .price { font-size: 1.25rem; font-weight: 800; }
+    .old-price { text-decoration: line-through; color: #94a3b8; font-size: .95rem; }
+    .product-actions { margin-top: 16px; }
+    .rating { color: #fbbf24; font-size: .92rem; }
+
+    .store-layout {
+      display: grid; grid-template-columns: 1.2fr .8fr; gap: 22px; align-items: start;
+    }
+
+    .cart-items {
+      display: grid; gap: 14px; margin: 18px 0;
+    }
+    .cart-item {
+      padding: 16px; border-radius: 18px;
+      background: rgba(255,255,255,.06); border: 1px solid var(--line);
+      display: grid; grid-template-columns: 76px 1fr auto; gap: 14px; align-items: center;
+    }
+    .cart-thumb {
+      width: 76px; height: 76px; border-radius: 16px; display: grid; place-items: center; font-size: 2rem;
+      background: rgba(255,255,255,.08); border: 1px solid var(--line);
+    }
+    .qty-box { display: flex; align-items: center; gap: 8px; margin-top: 8px; }
+    .qty-btn {
+      width: 32px; height: 32px; border-radius: 10px; border: 1px solid var(--line);
+      background: rgba(255,255,255,.08); color: white; cursor: pointer;
+    }
+
+    .summary {
+      display: grid; gap: 12px; margin-top: 18px;
+      padding-top: 18px; border-top: 1px solid var(--line);
+    }
+    .summary strong { font-size: 1.2rem; }
+
+    .form-grid {
+      display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; margin-top: 18px;
+    }
+    .field { display: grid; gap: 8px; }
+    .field.full { grid-column: 1 / -1; }
+    label { font-size: .94rem; color: #dbeafe; }
+    input, select, textarea {
+      width: 100%; border: 1px solid var(--line); outline: none;
+      background: rgba(255,255,255,.07); color: white; padding: 14px 14px;
+      border-radius: 14px; font-family: inherit;
+    }
+    input::placeholder, textarea::placeholder { color: #94a3b8; }
+    textarea { min-height: 110px; resize: vertical; }
+
+    .coupon-row {
+      display: grid; grid-template-columns: 1fr auto; gap: 10px; margin-top: 16px;
+    }
+
+    .success {
+      margin-top: 16px; padding: 14px 16px; border-radius: 14px;
+      background: rgba(34,197,94,.14); border: 1px solid rgba(34,197,94,.24); color: #dcfce7;
+      display: none;
+    }
+    .success.show { display: block; }
+
+    footer {
+      margin: 30px 0 40px; border-radius: 22px; padding: 26px;
+    }
+    .footer-grid { display: grid; grid-template-columns: 1.1fr .9fr .9fr .9fr; gap: 18px; }
+    footer ul { list-style: none; display: grid; gap: 10px; margin-top: 12px; }
+    footer a { color: var(--muted); text-decoration: none; }
+    footer a:hover { color: white; }
+    .footer-bottom {
+      margin-top: 22px; padding-top: 16px; border-top: 1px solid var(--line);
+      display: flex; justify-content: space-between; gap: 14px; flex-wrap: wrap; color: var(--muted);
+    }
+
+    @media (max-width: 1100px) {
+      .hero-grid, .store-layout, .product-grid, .category-grid, .feature-grid, .review-grid, .footer-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .store-layout { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 820px) {
+      .mobile-toggle { display: inline-grid; }
+      nav { display: none; width: 100%; }
+      nav.active { display: block; }
+      nav ul { flex-direction: column; align-items: flex-start; padding-top: 12px; }
+      .nav { flex-wrap: wrap; }
+      .hero-grid, .category-grid, .product-grid, .feature-grid, .review-grid, .footer-grid, .form-grid {
+        grid-template-columns: 1fr;
+      }
+      .section-head { flex-direction: column; align-items: start; }
+      .visual-bottom { grid-template-columns: 1fr; }
+      .cart-item { grid-template-columns: 1fr; }
+    }
+
+    @media (max-width: 560px) {
+      .container { width: min(calc(100% - 18px), var(--max)); }
+      .hero-card, .hero-panel, .section-box, .cart-panel, .checkout-panel, footer { padding: 20px; }
+      .coupon-row { grid-template-columns: 1fr; }
+      .hero-actions .btn, .nav-actions .btn { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="container">
+      <div class="nav glass">
+        <a href="#home" class="brand">
+          <div class="brand-mark">A</div>
+          <div>
+            <strong>AYATzoon</strong>
+            <small>Simple Full E-commerce Site</small>
+          </div>
+        </a>
+
+        <button class="icon-btn mobile-toggle" id="menuToggle">☰</button>
+
+        <nav id="mainNav">
+          <ul>
+            <li><a href="#home">Home</a></li>
+            <li><a href="#categories">Categories</a></li>
+            <li><a href="#products">Products</a></li>
+            <li><a href="#cart">Cart</a></li>
+            <li><a href="#checkout">Checkout</a></li>
+            <li><a href="#contact">Contact</a></li>
+          </ul>
+        </nav>
+
+        <div class="nav-actions">
+          <button class="icon-btn" id="cartCountBtn">🛒</button>
+          <a href="#products" class="btn btn-primary">Shop Now</a>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero" id="home">
+      <div class="container hero-grid">
+        <div class="hero-card glass reveal show">
+          <div class="badge">Modern • Simple • Full Demo Store</div>
+          <h1>একটি Simple Full E-commerce website, ready for your business.</h1>
+          <p class="lead">এই single HTML website-এ আছে homepage, categories, product section, cart system, coupon system, checkout form, এবং সুন্দর glass effect design। আপনি নিজের product, price, phone, Facebook, WhatsApp দিয়ে সহজেই customize করতে পারবেন।</p>
+          <div class="hero-actions" style="margin-top:20px;">
+            <a class="btn btn-primary" href="#products">Browse Products</a>
+            <a class="btn btn-secondary" href="#checkout">Go to Checkout</a>
+          </div>
+          <div class="hero-stats">
+            <div class="stat"><strong>12+</strong><span class="muted">Store Sections</span></div>
+            <div class="stat"><strong>4</strong><span class="muted">Demo Products</span></div>
+            <div class="stat"><strong>100%</strong><span class="muted">Responsive Layout</span></div>
+          </div>
+        </div>
+
+        <div class="hero-panel glass reveal show">
+          <div class="hero-visual">
+            <div class="visual-top glass">
+              <div class="blob"></div>
+              <div class="hero-product">🛍️</div>
+            </div>
+            <div class="visual-bottom">
+              <div class="mini glass">
+                <h3>Cash on Delivery</h3>
+                <p class="muted">সহজ order system এবং checkout structure।</p>
+              </div>
+              <div class="mini glass">
+                <h3>Easy Customization</h3>
+                <p class="muted">নিজের product name, image, price বদলাতে সহজ।</p>
+              </div>
+              <div class="mini glass">
+                <h3>Cart Included</h3>
+                <p class="muted">Add to cart, quantity control, remove item।</p>
+              </div>
+              <div class="mini glass">
+                <h3>Coupon Support</h3>
+                <p class="muted">SAVE10 coupon demo দেওয়া আছে।</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="categories">
+      <div class="container">
+        <div class="section-head reveal">
+          <div>
+            <div class="badge">Shop by Category</div>
+            <h2>Popular categories for a simple online store.</h2>
+          </div>
+          <p class="lead">এগুলো demo category। আপনি চাইলে Watch, Fashion, Gadgets, Perfume, Cosmetics বা আপনার own product category বসাতে পারবেন।</p>
+        </div>
+
+        <div class="category-grid">
+          <div class="card glass reveal">
+            <div class="category-icon">⌚</div>
+            <h3>Watches</h3>
+            <p class="muted">Premium and stylish watches for everyday looks.</p>
+          </div>
+          <div class="card glass reveal">
+            <div class="category-icon">🎧</div>
+            <h3>Gadgets</h3>
+            <p class="muted">Modern accessories and smart daily essentials.</p>
+          </div>
+          <div class="card glass reveal">
+            <div class="category-icon">👜</div>
+            <h3>Fashion</h3>
+            <p class="muted">Stylish fashion picks for your store visitors.</p>
+          </div>
+          <div class="card glass reveal">
+            <div class="category-icon">✨</div>
+            <h3>Beauty</h3>
+            <p class="muted">Clean layout for beauty and lifestyle items.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="products">
+      <div class="container">
+        <div class="section-head reveal">
+          <div>
+            <div class="badge">Featured Products</div>
+            <h2>Choose products and add them to cart instantly.</h2>
+          </div>
+          <div class="chips">
+            <button class="chip active" data-filter="all">All</button>
+            <button class="chip" data-filter="watch">Watch</button>
+            <button class="chip" data-filter="gadget">Gadget</button>
+            <button class="chip" data-filter="fashion">Fashion</button>
+            <button class="chip" data-filter="beauty">Beauty</button>
+          </div>
+        </div>
+
+        <div class="product-grid" id="productGrid">
+          <article class="card glass product-card reveal" data-category="watch" data-id="1" data-name="Crystal Edge Watch" data-price="2490" data-icon="⌚">
+            <span class="tag">Best Seller</span>
+            <div class="product-media">⌚</div>
+            <h3>Crystal Edge Watch</h3>
+            <p class="muted">Elegant premium watch with modern metallic finish.</p>
+            <div class="price-row">
+              <div><span class="price">৳2,490</span> <span class="old-price">৳3,200</span></div>
+              <div class="rating">★★★★★</div>
+            </div>
+            <div class="product-actions">
+              <button class="btn btn-primary add-to-cart">Add to Cart</button>
+              <button class="icon-btn">♡</button>
+            </div>
+          </article>
+
+          <article class="card glass product-card reveal" data-category="gadget" data-id="2" data-name="Nova Sound Pro" data-price="3790" data-icon="🎧">
+            <span class="tag">New</span>
+            <div class="product-media">🎧</div>
+            <h3>Nova Sound Pro</h3>
+            <p class="muted">Wireless headphone with stylish and premium build.</p>
+            <div class="price-row">
+              <div><span class="price">৳3,790</span> <span class="old-price">৳4,450</span></div>
+              <div class="rating">★★★★☆</div>
+            </div>
+            <div class="product-actions">
+              <button class="btn btn-primary add-to-cart">Add to Cart</button>
+              <button class="icon-btn">♡</button>
+            </div>
+          </article>
+
+          <article class="card glass product-card reveal" data-category="fashion" data-id="3" data-name="Velora Tote Bag" data-price="1890" data-icon="👜">
+            <span class="tag">Hot</span>
+            <div class="product-media">👜</div>
+            <h3>Velora Tote Bag</h3>
+            <p class="muted">Stylish tote bag designed for fashion and comfort.</p>
+            <div class="price-row">
+              <div><span class="price">৳1,890</span> <span class="old-price">৳2,350</span></div>
+              <div class="rating">★★★★★</div>
+            </div>
+            <div class="product-actions">
+              <button class="btn btn-primary add-to-cart">Add to Cart</button>
+              <button class="icon-btn">♡</button>
+            </div>
+          </article>
+
+          <article class="card glass product-card reveal" data-category="beauty" data-id="4" data-name="Radiant Skin Kit" data-price="1590" data-icon="✨">
+            <span class="tag">Limited</span>
+            <div class="product-media">✨</div>
+            <h3>Radiant Skin Kit</h3>
+            <p class="muted">Beauty kit with premium presentation and clean card style.</p>
+            <div class="price-row">
+              <div><span class="price">৳1,590</span> <span class="old-price">৳2,090</span></div>
+              <div class="rating">★★★★☆</div>
+            </div>
+            <div class="product-actions">
+              <button class="btn btn-primary add-to-cart">Add to Cart</button>
+              <button class="icon-btn">♡</button>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="cart">
+      <div class="container store-layout">
+        <div class="cart-panel glass reveal">
+          <div class="section-head" style="margin-bottom: 12px;">
+            <div>
+              <div class="badge">Shopping Cart</div>
+              <h2>Your selected items</h2>
+            </div>
+          </div>
+          <p class="lead">এখানে Add to Cart করলে product list দেখা যাবে। Quantity বাড়ানো-কমানো এবং remove করা যাবে।</p>
+
+          <div class="cart-items" id="cartItems">
+            <p class="muted" id="emptyCartText">Your cart is empty. Add products from above.</p>
+          </div>
+        </div>
+
+        <aside class="checkout-panel glass reveal">
+          <div class="badge">Order Summary</div>
+          <h2 style="font-size:1.7rem;">Checkout summary</h2>
+          <div class="coupon-row">
+            <input type="text" id="couponInput" placeholder="Coupon code (try SAVE10)">
+            <button class="btn btn-secondary" id="applyCoupon">Apply</button>
+          </div>
+
+          <div class="summary">
+            <div class="summary-line"><span class="muted">Subtotal</span><span id="subtotal">৳0</span></div>
+            <div class="summary-line"><span class="muted">Discount</span><span id="discount">৳0</span></div>
+            <div class="summary-line"><span class="muted">Delivery</span><span id="delivery">৳80</span></div>
+            <div class="summary-line"><strong>Total</strong><strong id="total">৳80</strong></div>
+          </div>
+          <a href="#checkout" class="btn btn-primary btn-block" style="margin-top:18px;">Proceed to Checkout</a>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section" id="checkout">
+      <div class="container">
+        <div class="section-box glass reveal">
+          <div class="section-head">
+            <div>
+              <div class="badge">Checkout Page</div>
+              <h2>Complete your order</h2>
+            </div>
+            <p class="lead">এটি demo checkout form। আপনি চাইলে WhatsApp order, Facebook inbox order, বা payment gateway পরে যোগ করতে পারবেন।</p>
+          </div>
+
+          <form id="checkoutForm">
+            <div class="form-grid">
+              <div class="field">
+                <label>Full Name</label>
+                <input type="text" placeholder="Enter your full name" required>
+              </div>
+              <div class="field">
+                <label>Phone Number</label>
+                <input type="tel" placeholder="Enter your phone number" required>
+              </div>
+              <div class="field full">
+                <label>Address</label>
+                <textarea placeholder="Enter your full delivery address" required></textarea>
+              </div>
+              <div class="field">
+                <label>City</label>
+                <input type="text" placeholder="Your city" required>
+              </div>
+              <div class="field">
+                <label>Payment Method</label>
+                <select required>
+                  <option value="">Select payment method</option>
+                  <option>Cash on Delivery</option>
+                  <option>bKash</option>
+                  <option>Nagad</option>
+                  <option>Bank Transfer</option>
+                </select>
+              </div>
+              <div class="field full">
+                <label>Order Notes</label>
+                <textarea placeholder="Optional notes for your order"></textarea>
+              </div>
+            </div>
+            <button class="btn btn-primary" type="submit" style="margin-top:18px;">Place Order</button>
+            <div class="success" id="successMessage">Order placed successfully. This is a demo confirmation message.</div>
+          </form>
+        </div>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="container">
+        <div class="section-head reveal">
+          <div>
+            <div class="badge">Why This Site</div>
+            <h2>Important features included in this simple full site.</h2>
+          </div>
+        </div>
+        <div class="feature-grid">
+          <div class="card glass reveal">
+            <h3>Homepage + Products</h3>
+            <p class="muted">Hero section, category cards, and professional product layout included.</p>
+          </div>
+          <div class="card glass reveal">
+            <h3>Cart Functionality</h3>
+            <p class="muted">Add to cart, update quantity, remove item, subtotal, discount, total.</p>
+          </div>
+          <div class="card glass reveal">
+            <h3>Checkout Form</h3>
+            <p class="muted">A ready structure for customer name, phone, address, city, and payment method.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="section" id="contact">
+      <div class="container">
+        <div class="section-box glass reveal">
+          <div class="section-head">
+            <div>
+              <div class="badge">Contact & Footer</div>
+              <h2>Ready to customize for your own brand.</h2>
+            </div>
+            <p class="lead">এখানে আপনার phone, email, WhatsApp, Facebook page link, logo, address, এবং product details বসিয়ে দিলে site টি আপনার নিজের business website হয়ে যাবে।</p>
+          </div>
+        </div>
+
+        <footer class="glass">
+          <div class="footer-grid">
+            <div>
+              <a href="#home" class="brand" style="margin-bottom:12px; display:inline-flex;">
+                <div class="brand-mark">A</div>
+                <div>
+                  <strong>AYATzoon</strong>
+                  <small>Simple online shopping experience</small>
+                </div>
+              </a>
+              <p class="muted">A simple full e-commerce website demo with hero, products, cart, coupon, and checkout sections.</p>
+            </div>
+            <div>
+              <h3>Quick Links</h3>
+              <ul>
+                <li><a href="#home">Home</a></li>
+                <li><a href="#products">Products</a></li>
+                <li><a href="#cart">Cart</a></li>
+                <li><a href="#checkout">Checkout</a></li>
+              </ul>
+            </div>
+            <div>
+              <h3>Support</h3>
+              <ul>
+                <li><a href="#">Shipping Policy</a></li>
+                <li><a href="#">Return Policy</a></li>
+                <li><a href="#">Privacy Policy</a></li>
+                <li><a href="#">Terms & Conditions</a></li>
+              </ul>
+            </div>
+            <div>
+              <h3>Contact</h3>
+              <ul>
+                <li><a href="mailto:hello@ayatzoon.com">hello@ayatzoon.com</a></li>
+                <li><a href="tel:+8801234567890">+880 1234-567890</a></li>
+                <li><a href="#">Facebook Page</a></li>
+                <li><a href="#">Dhaka, Bangladesh</a></li>
+              </ul>
+            </div>
+          </div>
+          <div class="footer-bottom">
+            <span>© 2026 AYATzoon. All rights reserved.</span>
+            <span>Simple Full E-commerce HTML Demo</span>
+          </div>
+        </footer>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const menuToggle = document.getElementById('menuToggle');
+    const mainNav = document.getElementById('mainNav');
+    if (menuToggle) {
+      menuToggle.addEventListener('click', () => mainNav.classList.toggle('active'));
+    }
+
+    const revealObserver = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('show');
+      });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.reveal').forEach(el => revealObserver.observe(el));
+
+    const chips = document.querySelectorAll('.chip');
+    const productCards = document.querySelectorAll('.product-card');
+    chips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        chips.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        const filter = chip.dataset.filter;
+        productCards.forEach(card => {
+          card.style.display = (filter === 'all' || card.dataset.category === filter) ? '' : 'none';
+        });
+      });
+    });
+
+    const cart = [];
+    let discountAmount = 0;
+    const deliveryCharge = 80;
+
+    const cartItems = document.getElementById('cartItems');
+    const emptyCartText = document.getElementById('emptyCartText');
+    const subtotalEl = document.getElementById('subtotal');
+    const discountEl = document.getElementById('discount');
+    const totalEl = document.getElementById('total');
+    const cartCountBtn = document.getElementById('cartCountBtn');
+
+    function money(value) {
+      return `৳${value.toLocaleString()}`;
+    }
+
+    function updateCartCount() {
+      const count = cart.reduce((sum, item) => sum + item.qty, 0);
+      cartCountBtn.textContent = `🛒 ${count}`;
+    }
+
+    function renderCart() {
+      cartItems.innerHTML = '';
+      if (cart.length === 0) {
+        cartItems.innerHTML = '<p class="muted" id="emptyCartText">Your cart is empty. Add products from above.</p>';
+      } else {
+        cart.forEach(item => {
+          const div = document.createElement('div');
+          div.className = 'cart-item';
+          div.innerHTML = `
+            <div class="cart-thumb">${item.icon}</div>
+            <div>
+              <h3>${item.name}</h3>
+              <p class="muted">${money(item.price)} each</p>
+              <div class="qty-box">
+                <button class="qty-btn" onclick="changeQty(${item.id}, -1)">−</button>
+                <span>${item.qty}</span>
+                <button class="qty-btn" onclick="changeQty(${item.id}, 1)">+</button>
+              </div>
+            </div>
+            <div style="display:grid; gap:10px; justify-items:end;">
+              <strong>${money(item.price * item.qty)}</strong>
+              <button class="btn btn-danger" style="padding:10px 12px;" onclick="removeItem(${item.id})">Remove</button>
+            </div>
+          `;
+          cartItems.appendChild(div);
+        });
+      }
+
+      const subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+      subtotalEl.textContent = money(subtotal);
+      discountEl.textContent = `- ${money(discountAmount)}`;
+      const total = Math.max(subtotal - discountAmount + deliveryCharge, deliveryCharge);
+      totalEl.textContent = money(total);
+      updateCartCount();
+    }
+
+    function addToCartFromCard(card) {
+      const id = Number(card.dataset.id);
+      const existing = cart.find(item => item.id === id);
+      if (existing) {
+        existing.qty += 1;
+      } else {
+        cart.push({
+          id,
+          name: card.dataset.name,
+          price: Number(card.dataset.price),
+          icon: card.dataset.icon,
+          qty: 1
+        });
+      }
+      renderCart();
+      location.hash = '#cart';
+    }
+
+    document.querySelectorAll('.add-to-cart').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        const card = e.target.closest('.product-card');
+        addToCartFromCard(card);
+      });
+    });
+
+    window.changeQty = function(id, amount) {
+      const item = cart.find(i => i.id === id);
+      if (!item) return;
+      item.qty += amount;
+      if (item.qty <= 0) {
+        const index = cart.findIndex(i => i.id === id);
+        cart.splice(index, 1);
+      }
+      renderCart();
+    }
+
+    window.removeItem = function(id) {
+      const index = cart.findIndex(i => i.id === id);
+      if (index !== -1) cart.splice(index, 1);
+      renderCart();
+    }
+
+    document.getElementById('applyCoupon').addEventListener('click', () => {
+      const code = document.getElementById('couponInput').value.trim().toUpperCase();
+      const subtotal = cart.reduce((sum, item) => sum + item.price * item.qty, 0);
+      if (code === 'SAVE10' && subtotal > 0) {
+        discountAmount = Math.round(subtotal * 0.10);
+        alert('Coupon applied: 10% discount');
+      } else {
+        discountAmount = 0;
+        alert('Invalid coupon or cart is empty');
+      }
+      renderCart();
+    });
+
+    document.getElementById('checkoutForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      document.getElementById('successMessage').classList.add('show');
+      this.reset();
+    });
+
+    renderCart();
+  </script>
+</body>
+</html>
